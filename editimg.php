@@ -1,36 +1,63 @@
+<?php
+include("db.php");
+
+$id = $_GET['id'];
+
+$query = "SELECT * FROM `user` WHERE id ='$id';";
+$excute = mysqli_query($conn, $query);
+
+$data = mysqli_fetch_assoc($excute);
+
+?>
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Editing</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   </head>
   <body>
     <div class="my-4 container">
-        <h1>Add Employee Image</h1>
-        <form action="./imageForm.php" method="post" enctype="multipart/form-data">
+        <h1>Edit Employee Image</h1>
+        <form action="./editimg.php" method="post" enctype="multipart/form-data">
+
+            
+            
+            <div class="my-4">
+                <label for="Name" class="form-lable">Image Id</label>
+                <input type="text" class="form-control"  name="id" value="<?php echo $data['id']?>">
+            </div>
+            <div class="my-4">
+                <label for="Name" class="form-lable">OLD Image</label>
+                <input type="text"  class="form-control" name="Oldimg" value="<?php echo $data['image']?>">
+            </div>
             <div class="my-4">
                 <label for="Name" class="form-lable">Name</label>
-                <input type="text" name="name" placeholder="Enter your name" class="form-control" required>
-                
+                <input type="text" name="name" value="<?php echo $data['image']?>" class="form-control" id="name" required>
             </div>
             <div class="my-4 ">
-                <label for="Name" class="form-lable">Name</label>
+                <label for="Name" class="form-lable">Uplode Image</label>
                 <input type="file" name="image" id="img" class="form-control" required>
             </div>
            <div class="my-4 gap-3 d-flex">
                 <input type="submit" name="submit" class="btn btn-primary">
                 <a href="allimg.php" class="btn btn-dark">Add More Images</a>
-                </div>
-            <a href="./allimg"></a>
+                <a href="./allimg.php" class="btn btn-success">View all Images </a>
+            </div>
+            
         </form>
-        <?php
+        
+    </div>
+     <?php
         include './db.php';
 
         if(isset($_POST['submit'])){
+            $id = $_POST['id'];
             $name = $_POST['name'];
-            $image= $_FILES['image'];
+            $Oldimg= $_FILES['Oldimg'];
+
+            $image = $_FILES['image'];
 
             $image_name = $_FILES['image']['name'];
             $image_temp = $_FILES['image']['tmp_name'];
@@ -40,10 +67,11 @@
 
             if($image_type == 'image/jpeg' || $image_type == 'image/jpg' || $image_type == 'image/png'  ){
                 if($image_size <= 15000000){
-                    $query = "insert into user (name, image) values('$name', '$path')";
+                    $query = "UPDATE `user` SET 'name'= '$name','image' = '$path' WHERE id = '$id' ";
                     $execute = mysqli_query($conn,$query);
                     if($execute){
-                        move_uploaded_file($image_temp,$path);
+                        unlink($Oldimg);
+                        move_uploaded_file($image_temp, $path);
                         echo "<script>alert('Data inserted'); </script>";
                     }else{
                         echo "<script>alert('Data does not inserted'); </script>";
